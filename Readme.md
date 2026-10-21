@@ -7,12 +7,12 @@ Visualização em cards com filtros por status (Assistido, Quero Assistir) e cat
 
 [//]: <img width="1600" height="805" alt="image" src="https://github.com/user-attachments/assets/ff06e70f-4ecf-43f3-a8e7-32efb994e9e4" />
 
-<img width="1919" height="1000" alt="image" src="https://github.com/user-attachments/assets/808ea1e3-3ac7-4b0a-bad2-06cb53cfcea9" />
+<img width="1442" height="1001" alt="image" src="https://github.com/user-attachments/assets/b04ae2b6-d8ec-4d0f-add8-a4c3e8d7e1d5" />
 
 ---
 
 ### **Modal de Detalhes, Avaliação e Resenha**
 Ao selecionar uma mídia, é exibida a sinopse, permitindo definir o status "Assistido" ou "Quero assistir", atribuir uma nota de 1.0 a 5.0 e escrever um comentário/análise pessoal.
 
-<img width="1919" height="999" alt="image" src="https://github.com/user-attachments/assets/b6e30b57-a136-4ee3-82c7-2f22aafbceef" />
+<img width="1459" height="999" alt="image" src="https://github.com/user-attachments/assets/86292cbf-673c-4130-8e14-738cebdacc6c" />
 

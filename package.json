@@ -1,0 +1,19 @@
+{
+  "name": "cinelog",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CineLog: backlog de filmes, séries e animes (100% client-side)",
+  "scripts": {
+    "test": "node tests/run.js",
+    "test:fast": "node tests/watch.js --once --fast",
+    "test:watch": "node tests/watch.js",
+    "test:watch:fast": "node tests/watch.js --fast",
+    "serve": "python -m http.server 5500 --directory frontend"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "playwright": "^1.50.0"
+  }
+}

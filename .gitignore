@@ -1,0 +1,26 @@
+# Segredos
+.env
+.env.local
+.env.*.local
+*.env
+
+# Vercel
+.vercel/
+
+# Node / Python / editor / SO
+node_modules/
+__pycache__/
+*.pyc
+venv/
+.venv/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+
+# Restos da versão antiga com backend (não usados mais)
+*.db
+
+# Testes: capturas de tela geradas automaticamente
+tests/artifacts/

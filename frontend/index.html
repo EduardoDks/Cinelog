@@ -2,52 +2,85 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; connect-src 'self' https://v3-cinemeta.strem.io https://graphql.anilist.co; object-src 'none'; base-uri 'none'; form-action 'self'">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CineLog: organize filmes, séries e animes que você assistiu ou quer assistir. Seus dados ficam salvos no seu navegador.">
   <title>CineLog - Seu Backlog de Mídia</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%AC%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <header>
-    <a class="logo" onclick="filterBacklog('all', this)">CineLog</a>
-    <div class="search-box">
-      <input type="text" id="searchInput" placeholder="Buscar filmes, animes... (Enter)">
+    <a class="logo" id="logoLink" href="./">CineLog</a>
+
+    <form class="search-box" id="searchForm" role="search">
+      <input type="search" id="searchInput" placeholder="Buscar filmes, séries, animes..."
+             maxlength="200" autocomplete="off" enterkeyhint="search" aria-label="Buscar títulos">
+
+    </form>
+
+    <div class="header-actions">
+      <button type="button" id="btnExport" title="Baixar um backup dos seus registros">Exportar</button>
+      <button type="button" id="btnImport" title="Restaurar registros de um backup">Importar</button>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
     </div>
-    <nav>
-      <button class="active" onclick="filterBacklog('all', this)">Todos</button>
-      <button onclick="filterBacklog('watched', this)">Assistidos</button>
-      <button onclick="filterBacklog('plan_to_watch', this)">Quero Assistir</button>
-    </nav>
   </header>
 
   <main class="container">
-    <div class="section-header">
-      <h2 class="section-title" id="pageTitle">Meu Backlog</h2>
+    <div class="notice notice-warn" id="storageWarning" hidden>
+      O armazenamento do navegador está bloqueado (modo privado ou configuração de privacidade).
+      Seus registros não serão salvos nesta sessão.
     </div>
 
-    <div class="media-grid" id="mediaGrid"></div>
+    <div class="section-header">
+      <h2 class="section-title" id="pageTitle">Meu Backlog</h2>
+      <button type="button" class="btn-link" id="btnBack" hidden>&larr; Voltar ao backlog</button>
+    </div>
+
+    <div class="notice" id="notice" hidden></div>
+
+    <div class="filters" id="filters">
+      <section class="filter-section">
+        <p class="filter-label" id="statusFilterLabel">Filtrar por status</p>
+        <nav class="filter-group" aria-labelledby="statusFilterLabel">
+          <button type="button" data-group="status" data-value="all">Todos</button>
+          <button type="button" data-group="status" data-value="watched">Assistidos</button>
+          <button type="button" data-group="status" data-value="plan_to_watch">Quero Assistir</button>
+        </nav>
+      </section>
+
+      <section class="filter-section">
+        <p class="filter-label" id="categoryFilterLabel">Filtrar por categoria</p>
+        <nav class="filter-group" aria-labelledby="categoryFilterLabel">
+          <button type="button" data-group="category" data-value="all">Todos</button>
+          <button type="button" data-group="category" data-value="filme">Filmes</button>
+          <button type="button" data-group="category" data-value="serie">Séries</button>
+          <button type="button" data-group="category" data-value="anime">Animes</button>
+        </nav>
+      </section>
+    </div>
+
+    <div class="media-grid" id="mediaGrid" aria-live="polite"></div>
   </main>
 
-  <!-- Modal -->
-  <div class="modal-overlay" id="mediaModal">
+  <!-- Detalhes / edição -->
+  <dialog class="modal" id="mediaModal" aria-labelledby="modalTitle">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 id="modalMediaTitle">Nome da Mídia</h3>
-        <button class="modal-close" onclick="closeModal()">&times;</button>
+        <h3 id="modalTitle">Título</h3>
+        <button type="button" class="modal-close" id="btnCloseModal" aria-label="Fechar">&times;</button>
       </div>
-      <form id="mediaForm">
-        <input type="hidden" id="modalTmdbId">
-        <input type="hidden" id="modalMediaType">
-        <input type="hidden" id="modalPosterPath">
-        <input type="hidden" id="modalOverview">
 
-        <div class="form-group">
-          <label>Sinopse</label>
-          <p id="modalOverviewText" style="font-size: 0.85rem; color: #a0a5b1; line-height: 1.4; max-height: 100px; overflow-y: auto; background: #2b303b; padding: 10px; border-radius: 6px; border: 1px solid #3d4351;">
-            Sem sinopse disponível.
-          </p>
+      <div class="modal-body">
+        <img class="modal-poster" id="modalPoster" alt="" referrerpolicy="no-referrer">
+        <div class="modal-info">
+          <p class="modal-meta" id="modalMeta"></p>
+          <p class="overview-text" id="modalOverview"></p>
         </div>
+      </div>
 
+      <form id="mediaForm">
         <div class="form-group">
           <label for="modalStatus">Status</label>
           <select id="modalStatus" required>
@@ -57,23 +90,32 @@
         </div>
 
         <div class="form-group">
-          <label for="modalRating">Sua Nota (1.0 a 5.0)</label>
+          <label for="modalRating">Sua nota (1.0 a 5.0)</label>
           <input type="number" id="modalRating" min="1" max="5" step="0.5" placeholder="Ex: 4.5">
         </div>
 
         <div class="form-group">
-          <label for="modalReview">Sua Análise / Comentário</label>
-          <textarea id="modalReview" rows="3" placeholder="O que achou dessa mídia?"></textarea>
+          <label for="modalReview">Sua análise / comentário</label>
+          <textarea id="modalReview" rows="3" maxlength="2000" placeholder="O que achou dessa mídia?"></textarea>
         </div>
 
         <div class="modal-actions">
-          <button type="submit" class="btn-submit">Salvar no Backlog</button>
-          <button type="button" class="btn-delete" id="btnDelete" onclick="deleteMedia()">Remover</button>
+          <button type="submit" class="btn-submit" id="btnSubmit">Adicionar ao backlog</button>
+          <button type="button" class="btn-delete" id="btnDelete" hidden>Remover</button>
         </div>
       </form>
     </div>
-  </div>
+  </dialog>
 
+  <footer class="site-footer">
+    <p>Filmes e séries: catálogo público Cinemeta (dados do IMDb). Animes: AniList.</p>
+    <p>Este site é um projeto pessoal e não é afiliado nem endossado por IMDb, Stremio ou AniList.</p>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="storageService.js"></script>
+  <script src="searchService.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

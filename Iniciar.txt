@@ -1,0 +1,13 @@
+.\venv\Scripts\python.exe -m pip install -r requirements.txt
+
+venv\Scripts\active.bat
+
+uvicorn main:app --reload
+
+----------
+
+cd C:\Users\anoni\Documents\Projeto\Cinelog\backend
+
+.\venv\Scripts\python.exe -m pip install -r requirements.txt
+
+.\start.bat
